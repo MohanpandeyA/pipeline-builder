@@ -16,6 +16,7 @@ export function SubmitButton({ onResult }) {
       if (!res.ok) throw new Error(`Server error: ${res.status}`);
 
       const data = await res.json();
+      console.log('[Pipeline API response]', data);
       onResult(data);
     } catch (err) {
       onResult({ error: err.message });
