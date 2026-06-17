@@ -8,15 +8,14 @@ app = FastAPI()
 
 import os
 
-ALLOWED_ORIGINS = os.getenv(
-    "ALLOWED_ORIGINS",
-    "http://localhost:3000"
-).split(",")
+# Allow all origins in production (configurable via ALLOWED_ORIGINS env var)
+_raw = os.getenv("ALLOWED_ORIGINS", "*")
+ALLOWED_ORIGINS = _raw.split(",") if _raw != "*" else ["*"]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
-    allow_credentials=True,
+    allow_credentials=ALLOWED_ORIGINS != ["*"],  # credentials not allowed with wildcard
     allow_methods=["*"],
     allow_headers=["*"],
 )
