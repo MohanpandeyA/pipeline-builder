@@ -6,7 +6,8 @@ export function SubmitButton({ onResult }) {
 
   const handleSubmit = async () => {
     try {
-      const res = await fetch('http://localhost:8000/pipelines/parse', {
+      const API = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+      const res = await fetch(`${API}/pipelines/parse`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ nodes, edges }),
