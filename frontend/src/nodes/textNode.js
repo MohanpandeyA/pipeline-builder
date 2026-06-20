@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Handle, Position, NodeResizer } from 'reactflow';
+import { Handle, Position, NodeResizer, useReactFlow } from 'reactflow';
 
 const VAR_REGEX = /\{\{\s*([a-zA-Z_$][a-zA-Z0-9_$]*)\s*\}\}/g;
 
@@ -7,6 +7,7 @@ export function TextNode({ id, data, selected }) {
   const [text, setText] = useState(data?.text || '');
   const [variables, setVariables] = useState([]);
   const textareaRef = useRef(null);
+  const { setNodes } = useReactFlow();
 
   const extractVariables = useCallback((val) => {
     const matches = [...val.matchAll(VAR_REGEX)];
@@ -14,12 +15,28 @@ export function TextNode({ id, data, selected }) {
     setVariables(unique);
   }, []);
 
+  // Auto-resize: grow the ReactFlow node height to fit content
   const autoResize = useCallback(() => {
     const el = textareaRef.current;
     if (!el) return;
+
+    // Reset textarea height to measure true scrollHeight
     el.style.height = 'auto';
-    el.style.height = `${Math.max(60, el.scrollHeight)}px`;
-  }, []);
+    const newTextareaHeight = Math.max(60, el.scrollHeight);
+    el.style.height = `${newTextareaHeight}px`;
+
+    // Header ~28px + label ~18px + padding ~24px + textarea
+    const newNodeHeight = newTextareaHeight + 70;
+
+    // Update the ReactFlow node's style.height so the card grows
+    setNodes((nds) =>
+      nds.map((n) =>
+        n.id === id
+          ? { ...n, style: { ...n.style, height: newNodeHeight } }
+          : n
+      )
+    );
+  }, [id, setNodes]);
 
   const handleChange = (e) => {
     const val = e.target.value;
@@ -78,7 +95,7 @@ export function TextNode({ id, data, selected }) {
         style={{ top: '50%' }}
       />
 
-      {/* Inner card */}
+      {/* Inner card — height: 100% fills the ReactFlow node which we update above */}
       <div style={{ ...styles.card, borderColor: selected ? '#6366f1' : '#252f47' }}>
         {/* Header */}
         <div style={styles.header}>
@@ -163,10 +180,10 @@ const styles = {
     color: '#4b6080',
     fontWeight: '500',
     display: 'block',
+    flexShrink: 0,
   },
   textarea: {
     width: '100%',
-    flex: 1,
     background: '#0d1117',
     border: '1px solid #1f2937',
     borderRadius: '4px',
@@ -178,5 +195,6 @@ const styles = {
     fontFamily: 'inherit',
     lineHeight: '1.5',
     minHeight: '50px',
+    overflow: 'hidden',  // hide scrollbar — node grows instead
   },
 };
