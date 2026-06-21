@@ -42,6 +42,12 @@ function FlowCanvas() {
   const { screenToFlowPosition } = useReactFlow();
   const { nodes, edges, onNodesChange, onEdgesChange, onConnect, addNode } = useStore();
 
+  // Prevent self-connections (node connecting to itself)
+  const isValidConnection = useCallback(
+    (connection) => connection.source !== connection.target,
+    []
+  );
+
   const onDragOver = useCallback((e) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
@@ -102,6 +108,7 @@ function FlowCanvas() {
         fitView
         deleteKeyCode="Delete"
         style={{ background: '#0f1117' }}
+        isValidConnection={isValidConnection}
       >
         <Background
           variant={BackgroundVariant.Dots}

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Handle, Position, NodeResizer, useReactFlow } from 'reactflow';
+import { Handle, Position, NodeResizer, useReactFlow, useUpdateNodeInternals } from 'reactflow';
 
 const VAR_REGEX = /\{\{\s*([a-zA-Z_$][a-zA-Z0-9_$]*)\s*\}\}/g;
 
@@ -8,6 +8,7 @@ export function TextNode({ id, data, selected }) {
   const [variables, setVariables] = useState([]);
   const textareaRef = useRef(null);
   const { setNodes } = useReactFlow();
+  const updateNodeInternals = useUpdateNodeInternals();
 
   const extractVariables = useCallback((val) => {
     const matches = [...val.matchAll(VAR_REGEX)];
@@ -52,6 +53,11 @@ export function TextNode({ id, data, selected }) {
     extractVariables(text);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Tell ReactFlow to re-register handles whenever variables change
+  useEffect(() => {
+    updateNodeInternals(id);
+  }, [variables, id, updateNodeInternals]);
 
   return (
     // Outer wrapper: overflow visible so handles aren't clipped
