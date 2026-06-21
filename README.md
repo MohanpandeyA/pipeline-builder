@@ -382,43 +382,147 @@ const nodes = useStore((s) => s.nodes);  // only re-renders when nodes change
 
 ---
 
-## Getting Started
+## Getting Started — Run Locally
 
-### Prerequisites
-- **Node.js** v18 or higher
-- **Python** 3.9 or higher
+Follow these steps exactly to get the app running on your machine from scratch.
 
-### 1. Clone the repository
+---
+
+### Step 0 — Install Prerequisites
+
+You need two tools installed before anything else.
+
+#### Node.js (for the frontend)
+1. Go to **https://nodejs.org**
+2. Download the **LTS** version (v18 or higher)
+3. Run the installer
+4. Verify it worked:
+   ```bash
+   node --version   # should print v18.x.x or higher
+   npm --version    # should print 9.x.x or higher
+   ```
+
+#### Python (for the backend)
+1. Go to **https://python.org/downloads**
+2. Download **Python 3.9** or higher
+3. Run the installer — on Windows, **check "Add Python to PATH"** during install
+4. Verify it worked:
+   ```bash
+   python3 --version   # should print Python 3.9.x or higher
+   pip3 --version      # should print pip 21.x or higher
+   ```
+
+---
+
+### Step 1 — Clone the Repository
+
 ```bash
-git clone <your-repo-url>
-cd vectorshift
+git clone https://github.com/MohanpandeyA/pipeline-builder.git
+cd pipeline-builder
 ```
 
-### 2. Start the Backend
+> If you don't have git installed: https://git-scm.com/downloads
+
+---
+
+### Step 2 — Set Up and Start the Backend
+
+Open a terminal and run:
+
 ```bash
-cd backend
-pip install -r requirements.txt
+# Navigate into the backend folder
+cd vectorshift/backend
+
+# Install Python dependencies
+pip3 install -r requirements.txt
+
+# Start the backend server
 uvicorn main:app --reload --port 8000
-# API available at: http://localhost:8000
-# Auto-docs at:     http://localhost:8000/docs
 ```
 
-### 3. Start the Frontend
+You should see output like:
+```
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process
+```
+
+✅ Backend is running at: **http://localhost:8000**
+📖 Auto-generated API docs at: **http://localhost:8000/docs**
+
+> Keep this terminal open. The `--reload` flag means the server restarts automatically when you edit `main.py`.
+
+---
+
+### Step 3 — Set Up and Start the Frontend
+
+Open a **second terminal** (keep the backend terminal running) and run:
+
 ```bash
-cd frontend
+# Navigate into the frontend folder
+cd vectorshift/frontend
+
+# Install JavaScript dependencies (only needed once)
 npm install
+
+# Start the frontend dev server
 npm start
-# App available at: http://localhost:3000
 ```
 
-### 4. Environment Variables (optional)
-
-Copy `frontend/.env.example` to `frontend/.env` and set:
+You should see:
 ```
+Compiled successfully!
+
+You can now view vectorshift-frontend in the browser.
+
+  Local:            http://localhost:3000
+```
+
+Your browser should open automatically at **http://localhost:3000**.
+
+> Keep this terminal open too. The dev server hot-reloads when you edit any `.js` file.
+
+---
+
+### Step 4 — Environment Variables (Optional)
+
+By default the frontend already points to `http://localhost:8000`. If you want to change the backend URL:
+
+```bash
+# In the frontend/ folder, copy the example file
+cp vectorshift/frontend/.env.example vectorshift/frontend/.env.local
+
+# Then open .env.local and confirm it contains:
 REACT_APP_API_URL=http://localhost:8000
 ```
 
-If not set, the frontend defaults to `http://localhost:8000`.
+Restart `npm start` after changing `.env.local`.
+
+---
+
+### Step 5 — Use the App
+
+1. Open **http://localhost:3000** in your browser
+2. **Drag** a node type from the left sidebar onto the canvas
+3. **Connect** nodes by hovering over a handle (dot on the edge of a node) and dragging to another handle
+4. Click **▶ Submit Pipeline** in the top-right header
+5. A modal will appear showing:
+   - Number of nodes
+   - Number of edges
+   - Whether the pipeline is a valid DAG (no cycles) — ✓ green or ✗ red
+
+---
+
+### Troubleshooting
+
+| Problem | Fix |
+|---------|-----|
+| `npm: command not found` | Node.js is not installed or not in PATH — reinstall from nodejs.org |
+| `pip3: command not found` | Python is not installed or not in PATH — reinstall from python.org |
+| `npm install` fails with EACCES | Run `sudo npm install` (macOS/Linux) or run terminal as Administrator (Windows) |
+| Backend shows `Address already in use` | Another process is on port 8000. Run: `lsof -ti:8000 \| xargs kill` (macOS/Linux) |
+| Frontend shows `Network Error` on submit | Make sure the backend is running on port 8000 |
+| Browser doesn't open automatically | Manually navigate to http://localhost:3000 |
+| `ModuleNotFoundError: No module named 'fastapi'` | Run `pip3 install -r requirements.txt` again inside the `vectorshift/backend/` folder |
 
 ---
 
