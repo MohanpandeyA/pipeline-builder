@@ -46,23 +46,28 @@ body {
 
 /* ── Handles ── */
 .react-flow__handle {
-  width: 10px;
-  height: 10px;
-  border: 2px solid #0f1117;
+  width: 16px;
+  height: 16px;
+  border: 2.5px solid #0f1117;
   border-radius: 50%;
-  transition: transform 0.15s;
+  transition: transform 0.15s, box-shadow 0.15s;
+  cursor: crosshair;
+  z-index: 10;
 }
 
 .react-flow__handle:hover {
-  transform: scale(1.4);
+  transform: scale(1.6);
+  box-shadow: 0 0 0 4px rgba(99,102,241,0.5);
 }
 
 .react-flow__handle-left {
   background: #3b82f6;
+  left: -8px;
 }
 
 .react-flow__handle-right {
   background: #22c55e;
+  right: -8px;
 }
 
 /* ── Node selection — remove default ReactFlow outline, NodeResizer handles it ── */
